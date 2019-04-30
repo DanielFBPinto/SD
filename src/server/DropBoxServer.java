@@ -54,7 +54,7 @@ public class DropBoxServer {
             //Bind service on rmiregistry and wait for calls
             if (registry != null) {
                 //============ Create Servant ============
-                dropBoxFactoryRI= new DropBoxFactoryRI() {
+                dropBoxFactoryRI= new DropBoxFactoryImpl() {
                     @Override
                     public DropBoxSessionRI register(String username, String password) throws RemoteException {
                         return null;
