@@ -1,4 +1,6 @@
 package server;
 
-public class DropboxSubjectRI {
+import java.rmi.Remote;
+
+public interface DropboxSubjectRI extends Remote {
 }

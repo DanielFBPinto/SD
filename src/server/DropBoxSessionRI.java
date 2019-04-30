@@ -1,4 +1,6 @@
 package server;
 
-public class DropBoxSessionRI {
+import java.rmi.Remote;
+
+public interface DropBoxSessionRI extends Remote {
 }

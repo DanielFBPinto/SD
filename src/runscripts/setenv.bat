@@ -12,10 +12,10 @@
 
 @REM ======================== CHANGE BELOW ACCORDING YOUR PROJECT and PC SETTINGS ========================
 @REM ==== PC STUFF ====
-@Set USERNAME=fabio
+@Set USERNAME=daniel
 
 @Set WORKDRIVE=C
-@Set JDK=%WORKDRIVE%:\Programas\Java\jdk1.8.0_201
+@Set JDK=%WORKDRIVE%:\Program Files\Java\jdk1.8.0_191
 @REM These vars will be used to check the output folder (whereto classes are generated)
 @SET NETBEANS=NetBeans
 @SET INTELLIJ=IntelliJ
@@ -26,11 +26,11 @@
 @Set JAVAPROJ_NAME=SD
 @set JAVAPROJ=%WORKDRIVE%:\Users\%USERNAME%\Documents\University\SDIS\%JAVAPROJ_NAME%
 @Set PACKAGE=observer
-@Set PACKAGE_PREFIX=edu.ufp.inf.sd.rmi
-@Set PACKAGE_PREFIX_FOLDERS=edu/ufp/inf/sd/rmi
-@Set SERVICE_NAME_ON_REGISTRY=ObserverService
-@Set CLIENT_CLASS_PREFIX=ObserverGui
-@Set SERVER_CLASS_PREFIX=Subject
+@Set PACKAGE_PREFIX=
+@Set PACKAGE_PREFIX_FOLDERS=
+@Set SERVICE_NAME_ON_REGISTRY=DropBoxService
+@Set CLIENT_CLASS_PREFIX=DropBox
+@Set SERVER_CLASS_PREFIX=DropBox
 @Set CLIENT_CLASS_POSTFIX=Client
 @Set SERVER_CLASS_POSTFIX=Server
 @Set SETUP_CLASS_POSTFIX=Setup
