@@ -10,7 +10,7 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
     }
 
     @Override
-    public DropBoxSessionRI Register(String username, String password) throws RemoteException {
+    public DropBoxSessionRI register(String username, String password) throws RemoteException {
         if(DB.users.containsKey(username)){
             return null;
         }
@@ -24,7 +24,7 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
     }
 
     @Override
-    public DropBoxSessionRI Login(String username, String password) throws RemoteException {
+    public DropBoxSessionRI login(String username, String password) throws RemoteException {
        if(DB.users.containsKey(username)){
            return DB.session.get(username);
        }
