@@ -56,12 +56,12 @@ public class DropBoxServer {
                 //============ Create Servant ============
                 dropBoxFactoryRI= new DropBoxFactoryRI() {
                     @Override
-                    public DropBoxSessionRI Register(String username, String password) throws RemoteException {
+                    public DropBoxSessionRI register(String username, String password) throws RemoteException {
                         return null;
                     }
 
                     @Override
-                    public DropBoxSessionRI Login(String username, String password) throws RemoteException {
+                    public DropBoxSessionRI login(String username, String password) throws RemoteException {
                         return null;
                     }
                 };
