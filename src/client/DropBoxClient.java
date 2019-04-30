@@ -84,7 +84,7 @@ public class DropBoxClient {
         try {
             //============ Call HelloWorld remote service ============
             this.dropBoxSessionRI = this.dropBoxFactoryRI.register("Teste", "12345");
-
+            this.dropBoxSessionRI.print();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
