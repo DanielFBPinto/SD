@@ -1,4 +1,11 @@
 package client;
 
-public class DropBoxObserverImpl {
+import java.rmi.RemoteException;
+
+public class DropBoxObserverImpl implements DropBoxObserverRI{
+
+    @Override
+    public void update() throws RemoteException {
+
+    }
 }
