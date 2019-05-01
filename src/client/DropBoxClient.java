@@ -2,6 +2,7 @@ package client;
 
 
 import server.DropBoxFactoryRI;
+import server.DropBoxSessionImpl;
 import server.DropBoxSessionRI;
 import util.rmisetup.SetupContextRMI;
 import java.rmi.NotBoundException;
@@ -21,14 +22,6 @@ public class DropBoxClient {
      * Remote interface that will hold the Servant proxy
      */
     private DropBoxFactoryRI dropBoxFactoryRI;
-    /**
-     * Interface remota do Observador associado ao nosso client
-     */
-    private DropBoxObserverRI dropBoxObserverRI;
-    /**
-     * Interface remota da sessão associada ao nosso client
-     */
-    private DropBoxSessionRI dropBoxSessionRI;
 
     public static void main(String[] args) {
         if (args != null && args.length < 2) {
@@ -83,8 +76,13 @@ public class DropBoxClient {
     private void playService() {
         try {
             //============ Call HelloWorld remote service ============
-            this.dropBoxSessionRI = this.dropBoxFactoryRI.register("Teste", "12345");
-            this.dropBoxSessionRI.print();
+            System.out.println(1);
+            DropBoxSessionRI asd =this.dropBoxFactoryRI.register("Teste", "12345");
+            System.out.println(2);
+            asd.print();
+            System.out.println(3);
+            //this.dropBoxSessionRI = this.dropBoxFactoryRI.login("Teste","12345");
+            //((DropBoxSessionImpl)this.dropBoxSessionRI).print();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
