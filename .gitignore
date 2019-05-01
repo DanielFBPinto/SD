@@ -2,5 +2,7 @@
 \.idea/workspace\.xml
 
 src/runscripts/setenv\.bat
+
+src/runscripts/
 
 out/production/Projeto/runscripts/setenv\.bat
