@@ -13,24 +13,28 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
 
     @Override
     public DropBoxSessionRI register(String username, String password) throws RemoteException {
-        if (DB.users.containsKey(username)) {
+        if (DB.getUser(username) != null) {
             return null;
         }
+        // Adicionar dados do User na base de dados
         User user = new User(username, password);
-        DB.users.put(username, user);
-        DropBoxSessionImpl sessionImpl = new DropBoxSessionImpl();
-        DB.session.put(username, sessionImpl);
-        System.out.println(System.getProperty("user.dir"));
-        new File(System.getProperty("user.dir") + "../../../../Users/" + username).mkdirs();
+        DB.putUser(user);
+        // Criar pasta do User no Server
+        String serverPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + username + ")/" + username;
+        File path = new File(serverPath);
+        path.mkdirs();
+        // Criar Subject e associa-lo ao folder do user
+        DropboxSubjectImpl dropboxSubjectImpl = new DropboxSubjectImpl(path);
+        // Criar Sessão e associa-la ao subject do user
+        DropBoxSessionImpl sessionImpl = new DropBoxSessionImpl(dropboxSubjectImpl);
+        // Guardar sessão na base de dados
+        DB.insertSession(username, sessionImpl);
+        // retornar sessão
         return sessionImpl;
-
     }
 
     @Override
     public DropBoxSessionRI login(String username, String password) throws RemoteException {
-        if (DB.users.containsKey(username)) {
-            return DB.session.get(username);
-        }
-        return null;
+        return DB.getSession(username, password);
     }
 }

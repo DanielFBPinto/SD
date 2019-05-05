@@ -3,8 +3,11 @@ package client;
 
 import server.DropBoxFactoryRI;
 import server.DropBoxSessionRI;
-import server.DropboxSubjectRI;
+import server.DropBoxSubjectRI;
+import server.DropboxSubjectImpl;
 import util.rmisetup.SetupContextRMI;
+
+import java.io.File;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -30,6 +33,10 @@ public class DropBoxClient {
      * Interface remota da sessão associada ao nosso client
      */
     private DropBoxSessionRI dropBoxSessionRI;
+    /**
+     * File associado ao diretório do cliente
+     */
+    private File path;
 
     public static void main(String[] args) {
         if (args != null && args.length < 2) {
@@ -83,10 +90,22 @@ public class DropBoxClient {
 
     private void playService() {
         try {
-            //============ Call HelloWorld remote service ============
-            this.dropBoxSessionRI = this.dropBoxFactoryRI.register("Teste", "12345");
-            // Teste
-            System.out.println(this.dropBoxSessionRI.print());
+            // Registar User
+            this.dropBoxSessionRI = this.dropBoxFactoryRI.login("Teste", "12345");
+            // Criar Observer
+            this.dropBoxObserverRI = new DropBoxObserverImpl();
+            // Criar pasta do lado do cliente
+            String userPath = System.getProperty("user.dir") + "../../../../data/Server/" + "Teste";
+            this.path = new File(userPath);
+            this.path.mkdirs();
+            // Receber Subject do owner
+            DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
+            // Dar attach do observador do cliente
+            mySubject.attach(this.dropBoxObserverRI);
+            // Testar criação de pasta
+            mySubject.editFolder(path.getPath(),"jogos", "musica");
+
+
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
