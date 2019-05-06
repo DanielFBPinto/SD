@@ -1,11 +1,12 @@
 package server;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DropBoxSessionImpl implements DropBoxSessionRI {
+public class DropBoxSessionImpl implements DropBoxSessionRI, Serializable {
     DropboxSubjectImpl ownerSubject;
 
     public DropBoxSessionImpl(DropboxSubjectImpl ownerSubject) throws RemoteException {

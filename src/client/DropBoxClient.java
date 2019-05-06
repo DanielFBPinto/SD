@@ -33,10 +33,6 @@ public class DropBoxClient {
      * Interface remota da sessão associada ao nosso client
      */
     private DropBoxSessionRI dropBoxSessionRI;
-    /**
-     * File associado ao diretório do cliente
-     */
-    private File path;
 
     public static void main(String[] args) {
         if (args != null && args.length < 2) {
@@ -97,18 +93,16 @@ public class DropBoxClient {
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
             }
             if (this.dropBoxSessionRI != null) {
-                /* Criar Observer */
-                this.dropBoxObserverImpl = new DropBoxObserverImpl();
-                /* Criar pasta do lado do cliente */
-                String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
-                this.path = new File(userPath);
-                this.path.mkdirs();
                 /* Receber Subject do owner */
                 DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
+                /* Diretório do lado do cliente */
+                String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
+                /* Criar Observer */
+                this.dropBoxObserverImpl = new DropBoxObserverImpl(new File(userPath), mySubject);
                 /* Dar attach do observador do cliente */
                 mySubject.attach(this.dropBoxObserverImpl);
                 /* Testar criação de pasta */
-                mySubject.createFolder(path.getPath(), "filmes");
+                this.dropBoxObserverImpl.createFolder(".","jogos");
                 /* Dar detach do observador do cliente */
                 mySubject.detach(this.dropBoxObserverImpl);
             } else if (args[3].compareTo("register") == 0) {

@@ -4,11 +4,12 @@ import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
 
 import java.io.File;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class DropboxSubjectImpl implements DropBoxSubjectRI {
+public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
     private File path;
     private User owner;
     private State state;
@@ -40,24 +41,18 @@ public class DropboxSubjectImpl implements DropBoxSubjectRI {
 
     @Override
     public void createFolder(String path, String name) throws RemoteException {
-        new File(path + "/" + name).mkdirs();
-        new File(this.path.getPath() + "/" + name).mkdirs();
+        new File(this.path.getPath() + "/" + path + "/" + name).mkdirs();
     }
 
     @Override
     public void deleteFolder(String path, String name) throws RemoteException {
-        new File(path + "/" + name).delete();
-        new File(this.path.getPath() + "/" + name).delete();
+        new File(this.path.getPath() + "/" + path + "/" + name).delete();
     }
 
     @Override
     public void editFolder(String path, String oldname, String newName) throws RemoteException {
-        File dirC = new File(path + "/" + oldname);
-        File newDirC = new File(dirC.getParent() + "/" + newName);
-        dirC.renameTo(newDirC);
-
-        File dirS = new File(this.path.getPath() + "/" + oldname);
-        File newDirS = new File(dirS.getParent() + "/" + newName);
-        dirS.renameTo(newDirS);
+        File dir = new File(this.path.getPath() + "/" + path + "/" + oldname);
+        File newDir = new File(dir.getParent() + "/" + newName);
+        dir.renameTo(newDir);
     }
 }
