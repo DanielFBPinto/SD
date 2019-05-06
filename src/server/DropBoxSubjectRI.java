@@ -1,5 +1,6 @@
 package server;
 
+import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
 
 import java.rmi.Remote;

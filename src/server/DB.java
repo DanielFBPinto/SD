@@ -6,7 +6,6 @@ import java.util.Properties;
 
 public class DB {
     private static String path = System.getProperty("user.dir") + "../../../../db";
-    //    protected static HashMap<String,User> users =new HashMap<>();
     private static HashMap<String, DropBoxSessionImpl> session = new HashMap<>();
 
     public static void putUser(User user) {
@@ -26,7 +25,7 @@ public class DB {
 
             //load a properties file from class path, inside static method
             prop.load(input);
-            if (prop.containsKey("name"))
+            if (prop.containsKey(name))
                 return new User(name, prop.getProperty(name));
             return null;
 
@@ -49,7 +48,7 @@ public class DB {
 
     public static void loadSessions() {
         try {
-            ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(path + "/session.txt"));
+            ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(path + "/sessions.txt"));
             Object obj = objIn.readObject();
             if (obj instanceof HashMap) {
                 session = (HashMap<String, DropBoxSessionImpl>) obj;
@@ -67,13 +66,10 @@ public class DB {
     }
 
     public static DropBoxSessionRI getSession(String username, String password) {
-        for (DropBoxSessionRI ds : session.values()) {
-            System.out.println("one");
-        }
-        if(session == null)
+        if(session.isEmpty())
             loadSessions();
-//        if(getUser(username).getPassword().compareTo(password) == 0)
+        if(getUser(username).getPassword().compareTo(password) == 0)
             return session.get(username);
-//        return null;
+        return null;
     }
 }

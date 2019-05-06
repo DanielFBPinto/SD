@@ -18,7 +18,7 @@ public class DropBoxSessionImpl extends UnicastRemoteObject implements DropBoxSe
 //    }
 
     @Override
-    public DropBoxSubjectRI getOwnerSubject() throws RemoteException {
+    public DropboxSubjectImpl getOwnerSubject() throws RemoteException {
         return ownerSubject;
     }
 }

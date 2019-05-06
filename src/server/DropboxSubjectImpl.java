@@ -1,5 +1,6 @@
 package server;
 
+import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 
 public class DropboxSubjectImpl extends UnicastRemoteObject implements DropBoxSubjectRI {
     private File path;
+    private User owner;
     private State state;
     private ArrayList<DropBoxObserverRI> observers = new ArrayList<>();
 
@@ -16,8 +18,9 @@ public class DropboxSubjectImpl extends UnicastRemoteObject implements DropBoxSu
         return path;
     }
 
-    public DropboxSubjectImpl(File path) throws RemoteException {
+    public DropboxSubjectImpl(User owner, File path) throws RemoteException {
         super();
+        this.owner = owner;
         this.path = path;
     }
 

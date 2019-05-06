@@ -28,7 +28,7 @@ public class DropBoxClient {
     /**
      * Interface remota do Observador associado ao nosso client
      */
-    private DropBoxObserverRI dropBoxObserverRI;
+    private DropBoxObserverImpl dropBoxObserverImpl;
     /**
      * Interface remota da sessão associada ao nosso client
      */
@@ -48,7 +48,7 @@ public class DropBoxClient {
             //2. ============ Lookup service ============
             hwc.lookupService();
             //3. ============ Play with service ============
-            hwc.playService();
+            hwc.playService(args);
         }
     }
 
@@ -88,22 +88,34 @@ public class DropBoxClient {
         return dropBoxFactoryRI;
     }
 
-    private void playService() {
+    private void playService(String[] args) {
         try {
-            // Registar User
-            this.dropBoxSessionRI = this.dropBoxFactoryRI.login("Teste", "12345");
-            // Criar Observer
-            this.dropBoxObserverRI = new DropBoxObserverImpl();
-            // Criar pasta do lado do cliente
-            String userPath = System.getProperty("user.dir") + "../../../../data/Server/" + "Teste";
-            this.path = new File(userPath);
-            this.path.mkdirs();
-            // Receber Subject do owner
-            DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
-            // Dar attach do observador do cliente
-            mySubject.attach(this.dropBoxObserverRI);
-            // Testar criação de pasta
-            mySubject.editFolder(path.getPath(),"jogos", "musica");
+            /* Registar User */
+            if (args[3].compareTo("register") == 0) {
+                this.dropBoxSessionRI = this.dropBoxFactoryRI.register(args[4], args[5]);
+            } else {     /* Login User */
+                this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
+            }
+            if (dropBoxSessionRI != null) {
+                /* Criar Observer */
+                this.dropBoxObserverImpl = new DropBoxObserverImpl();
+                /* Criar pasta do lado do cliente */
+                String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
+                this.path = new File(userPath);
+                this.path.mkdirs();
+                /* Receber Subject do owner */
+                DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
+                /* Dar attach do observador do cliente */
+                mySubject.attach(this.dropBoxObserverImpl);
+                /* Testar criação de pasta */
+                mySubject.createFolder(path.getPath(), "filmes");
+                /* Dar detach do observador do cliente */
+                mySubject.detach(this.dropBoxObserverImpl);
+            } else if (args[3].compareTo("register") == 0) {
+                System.out.println("Username já a ser utilizado");
+            } else {
+                System.out.println("Login incorreto");
+            }
 
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
