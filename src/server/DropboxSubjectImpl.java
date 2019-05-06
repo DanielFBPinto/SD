@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class DropboxSubjectImpl extends UnicastRemoteObject implements DropBoxSubjectRI {
+public class DropboxSubjectImpl implements DropBoxSubjectRI {
     private File path;
     private User owner;
     private State state;
@@ -19,9 +19,13 @@ public class DropboxSubjectImpl extends UnicastRemoteObject implements DropBoxSu
     }
 
     public DropboxSubjectImpl(User owner, File path) throws RemoteException {
-        super();
         this.owner = owner;
         this.path = path;
+        export();
+    }
+
+    private void export() throws RemoteException {
+        UnicastRemoteObject.exportObject(this, 0);
     }
 
     @Override

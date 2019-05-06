@@ -96,7 +96,7 @@ public class DropBoxClient {
             } else {     /* Login User */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
             }
-            if (dropBoxSessionRI != null) {
+            if (this.dropBoxSessionRI != null) {
                 /* Criar Observer */
                 this.dropBoxObserverImpl = new DropBoxObserverImpl();
                 /* Criar pasta do lado do cliente */

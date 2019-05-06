@@ -5,11 +5,11 @@ import server.DropBoxSubjectRI;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class DropBoxObserverImpl extends UnicastRemoteObject  implements DropBoxObserverRI{
+public class DropBoxObserverImpl implements DropBoxObserverRI{
 
     public DropBoxObserverImpl() throws RemoteException{
         super();
-//        export();
+        export();
     }
 
     @Override
@@ -17,8 +17,7 @@ public class DropBoxObserverImpl extends UnicastRemoteObject  implements DropBox
 
     }
 
-    public void export(DropBoxSubjectRI dropBoxSubjectRI) throws RemoteException {
-//        UnicastRemoteObject.exportObject(this, 0);
-//        dropBoxSubjectRI.attach(this);
+    public void export() throws RemoteException {
+        UnicastRemoteObject.exportObject(this, 0);
     }
 }
