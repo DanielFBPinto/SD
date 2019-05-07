@@ -10,11 +10,11 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class DropBoxObserverImpl implements DropBoxObserverRI{
+public class DropBoxObserverImpl implements DropBoxObserverRI {
     private File path;
     private DropBoxSubjectRI dropBoxSubjectRI;
 
-    public DropBoxObserverImpl(File path, DropBoxSubjectRI dropBoxSubjectRI) throws RemoteException{
+    public DropBoxObserverImpl(File path, DropBoxSubjectRI dropBoxSubjectRI) throws RemoteException {
         super();
         this.path = path;
         this.dropBoxSubjectRI = dropBoxSubjectRI;
@@ -33,16 +33,16 @@ public class DropBoxObserverImpl implements DropBoxObserverRI{
     @Override
     public void createFolder(String path, String name) throws RemoteException {
         new File(this.path.getPath() + "/" + path + "/" + name).mkdirs();
-        Visitor visitor= new CreateFolder(name,path);
+        Visitor visitor = new CreateFolder(name, path);
         this.dropBoxSubjectRI.accept(visitor);
-       // this.dropBoxSubjectRI.createFolder(path, name);
+        // this.dropBoxSubjectRI.createFolder(path, name);
     }
 
     @Override
     public void deleteFolder(String path, String name) throws RemoteException {
         new File(this.path.getPath() + "/" + path + "/" + name).delete();
         this.dropBoxSubjectRI.deleteFolder(path, name);
-        Visitor visitor= new DeleteFolder(name,path);
+        Visitor visitor = new DeleteFolder(name, path);
         this.dropBoxSubjectRI.accept(visitor);
     }
 
@@ -51,13 +51,14 @@ public class DropBoxObserverImpl implements DropBoxObserverRI{
         File dirC = new File(this.path.getPath() + "/" + path + "/" + oldname);
         File newDirC = new File(dirC.getParent() + "/" + newName);
         dirC.renameTo(newDirC);
-        Visitor visitor= new RenameFolder(oldname,path,newName);
+        Visitor visitor = new RenameFolder(oldname, path, newName);
         this.dropBoxSubjectRI.renameFolder(path, oldname, newName);
 
         this.dropBoxSubjectRI.accept(visitor);
     }
+
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws RemoteException {
         visitor.visit(this.path);
     }
 }

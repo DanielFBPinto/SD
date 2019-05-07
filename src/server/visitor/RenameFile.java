@@ -4,7 +4,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class RenameFile implements Visitor  {
+public class RenameFile implements Visitor {
     private final String name;
     private final String path;
     private final String newName;
@@ -15,11 +15,14 @@ public class RenameFile implements Visitor  {
         this.newName = newName;
         export();
     }
-    public void visit(File file){
+
+    @Override
+    public void visit(File file) throws RemoteException {
         File dirC = new File(file.getPath() + "/" + this.getPath() + "/" + this.getName());
         File newDirC = new File(dirC.getParent() + "/" + this.getNewName());
         dirC.renameTo(newDirC);
     }
+
     public String getName() {
         return name;
     }
@@ -31,6 +34,7 @@ public class RenameFile implements Visitor  {
     public String getNewName() {
         return newName;
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }

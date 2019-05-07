@@ -9,7 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class DropboxSubjectImpl implements DropBoxSubjectRI , Serializable {
+public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
     private File path;
     private User owner;
     private State state;
@@ -55,15 +55,16 @@ public class DropboxSubjectImpl implements DropBoxSubjectRI , Serializable {
         File newDir = new File(dir.getParent() + "/" + newName);
         dir.renameTo(newDir);
     }
-    private void notifyAll(Visitor visitor){
-        for (DropBoxObserverRI obs:this.observers
-             ) {
+
+    private void notifyAll(Visitor visitor) throws RemoteException {
+        for (DropBoxObserverRI obs : this.observers) {
             obs.accept(visitor);
         }
     }
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this.getPath());
 
+    @Override
+    public void accept(Visitor visitor) throws RemoteException {
+        visitor.visit(this.getPath());
+        notifyAll();
     }
 }

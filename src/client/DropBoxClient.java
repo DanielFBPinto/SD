@@ -96,13 +96,14 @@ public class DropBoxClient {
                 } else {
                     System.out.println("Username já a ser utilizado");
                 }
-            } else if (args[3].compareTo("share") == 0){
+            } else if (args[3].compareTo("share") == 0){        /* Sharing Folders */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
                 this.dropBoxSessionRI.shareOwnerSubjectWith(args[6]);
             }else{     /* Login User */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
             }
-            if (this.dropBoxSessionRI != null && args[3].compareTo("share") == 0) {
+            /* Login/Registo bem sucedidos */
+            if (this.dropBoxSessionRI != null && !(args[3].compareTo("share") == 0)) {
                 /* Receber Subject do owner */
                 DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
                 /* Criar Observer */
@@ -110,7 +111,6 @@ public class DropBoxClient {
                 /* Dar attach do observador do cliente */
                 mySubject.attach(this.dropBoxObserverImpl);
                 /* Testar criação de pasta */
-//                this.dropBoxSessionRI.shareOwnerSubjectWith("daniel");
                 this.dropBoxObserverImpl.createFolder(".", "jogos");
                 /* Dar detach do observador do cliente */
                 mySubject.detach(this.dropBoxObserverImpl);

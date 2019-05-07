@@ -13,9 +13,12 @@ public class EditFile implements Visitor {
         this.path = path;
         export();
     }
-    public void visit(File file){
+
+    @Override
+    public void visit(File file) throws RemoteException {
         /* TODO */
     }
+
     public String getName() {
         return name;
     }
@@ -23,6 +26,7 @@ public class EditFile implements Visitor {
     public String getPath() {
         return path;
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }

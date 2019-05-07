@@ -14,7 +14,8 @@ public class CreateFolder implements Visitor{
         this.path = path;
         export();
     }
-    public void visit(File file){
+    @Override
+    public void visit(File file) throws RemoteException{
         new File(file.getPath() + this.path+"/"+this.name).mkdirs();
     }
 

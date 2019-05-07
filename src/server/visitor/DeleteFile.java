@@ -4,7 +4,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class DeleteFile implements Visitor{
+public class DeleteFile implements Visitor {
     private final String name;
     private final String path;
 
@@ -13,9 +13,12 @@ public class DeleteFile implements Visitor{
         this.path = path;
         export();
     }
-    public void visit(File file){
+
+    @Override
+    public void visit(File file) throws RemoteException {
         new File(file.getPath() + "/" + this.path + "/" + this.name).delete();
     }
+
     public String getName() {
         return name;
     }
@@ -23,6 +26,7 @@ public class DeleteFile implements Visitor{
     public String getPath() {
         return path;
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }

@@ -8,7 +8,7 @@ public class CreateFile implements Visitor {
     private final String name;
     private final String path;
 
-    public CreateFile(String name, String path) throws RemoteException{
+    public CreateFile(String name, String path) throws RemoteException {
         this.name = name;
         this.path = path;
         export();
@@ -23,9 +23,10 @@ public class CreateFile implements Visitor {
     }
 
     @Override
-    public void visit(File file) {
-        new File(file.getPath() + this.path+"/"+this.name).mkdirs();
+    public void visit(File file) throws RemoteException {
+        new File(file.getPath() + this.path + "/" + this.name).mkdirs();
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }

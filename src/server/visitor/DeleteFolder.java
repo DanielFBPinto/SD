@@ -13,7 +13,9 @@ public class DeleteFolder implements Visitor {
         this.path = path;
         export();
     }
-    public void visit(File file){
+
+    @Override
+    public void visit(File file) throws RemoteException {
         new File(file.getPath() + "/" + this.getPath() + "/" + this.getName()).delete();
     }
 
@@ -24,6 +26,7 @@ public class DeleteFolder implements Visitor {
     public String getPath() {
         return path;
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }

@@ -15,11 +15,14 @@ public class RenameFolder implements Visitor {
         this.newName = newName;
         export();
     }
-    public void visit(File file){
+
+    @Override
+    public void visit(File file) throws RemoteException {
         File dirC = new File(file.getPath() + "/" + this.getPath() + "/" + this.getName());
         File newDirC = new File(dirC.getParent() + "/" + this.getNewName());
         dirC.renameTo(newDirC);
     }
+
     public String getName() {
         return name;
     }
@@ -31,6 +34,7 @@ public class RenameFolder implements Visitor {
     public String getNewName() {
         return newName;
     }
+
     private void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);
     }
