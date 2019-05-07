@@ -1,16 +1,15 @@
 package server;
 
-import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
+import server.visitor.Visitor;
 
-import java.beans.Transient;
 import java.io.File;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
+public class DropboxSubjectImpl implements DropBoxSubjectRI , Serializable {
     private File path;
     private User owner;
     private State state;
@@ -55,5 +54,16 @@ public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
         File dir = new File(this.path.getPath() + "/" + path + "/" + oldname);
         File newDir = new File(dir.getParent() + "/" + newName);
         dir.renameTo(newDir);
+    }
+    private void notifyAll(Visitor visitor){
+        for (DropBoxObserverRI obs:this.observers
+             ) {
+            obs.accept(visitor);
+        }
+    }
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this.getPath());
+
     }
 }

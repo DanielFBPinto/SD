@@ -1,12 +1,20 @@
 package server.visitor;
 
-public class DeleteFolder {
+import java.io.File;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class DeleteFolder implements Visitor {
     private final String name;
     private final String path;
 
-    public DeleteFolder(String name, String path) {
+    public DeleteFolder(String name, String path) throws RemoteException {
         this.name = name;
         this.path = path;
+        export();
+    }
+    public void visit(File file){
+        new File(file.getPath() + "/" + this.getPath() + "/" + this.getName()).delete();
     }
 
     public String getName() {
@@ -15,5 +23,8 @@ public class DeleteFolder {
 
     public String getPath() {
         return path;
+    }
+    private void export() throws RemoteException {
+        UnicastRemoteObject.exportObject(this, 0);
     }
 }
