@@ -9,12 +9,22 @@ public class DB {
     private static HashMap<String, DropBoxSessionImpl> session = new HashMap<>();
 
     public static void putUser(User user) {
-        Properties properties = new Properties();
-        properties.setProperty(user.getUsername(), user.getPassword());
-        try {
-            properties.store(new FileOutputStream(path + "/users.properties"), null);
-        } catch (IOException e) {
-            System.out.println("Sorry, unable to find users.properties");
+        try(FileInputStream in = new FileInputStream(path + "/users.properties")) {
+            Properties prop = new Properties();
+            prop.load(in);
+            in.close();
+            FileOutputStream out = new FileOutputStream(path + "/users.properties");
+            prop.setProperty(user.getUsername(), user.getPassword());
+            prop.store(out, null);
+            out.close();
+        } catch(Exception ex) {
+            Properties prop = new Properties();
+            prop.setProperty(user.getUsername(), user.getPassword());
+            try {
+                prop.store(new FileOutputStream(path + "/users.properties"), null);
+            } catch (IOException e) {
+                System.out.println("Sorry, unable to find users.properties");
+            }
         }
     }
 

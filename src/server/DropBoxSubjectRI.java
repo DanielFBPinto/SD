@@ -11,5 +11,5 @@ public interface DropBoxSubjectRI extends Remote {
     public void detach(DropBoxObserverRI obsRI) throws RemoteException;
     public void createFolder(String path, String name) throws RemoteException;
     public void deleteFolder(String path, String name) throws RemoteException;
-    public void editFolder(String path, String oldname, String newName) throws RemoteException;
+    public void renameFolder(String path, String oldname, String newName) throws RemoteException;
 }

@@ -3,6 +3,7 @@ package server;
 import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
 
+import java.beans.Transient;
 import java.io.File;
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -50,7 +51,7 @@ public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
     }
 
     @Override
-    public void editFolder(String path, String oldname, String newName) throws RemoteException {
+    public void renameFolder(String path, String oldname, String newName) throws RemoteException {
         File dir = new File(this.path.getPath() + "/" + path + "/" + oldname);
         File newDir = new File(dir.getParent() + "/" + newName);
         dir.renameTo(newDir);

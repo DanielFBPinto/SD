@@ -39,10 +39,10 @@ public class DropBoxObserverImpl implements DropBoxObserverRI{
     }
 
     @Override
-    public void editFolder(String path, String oldname, String newName) throws RemoteException {
+    public void renameFolder(String path, String oldname, String newName) throws RemoteException {
         File dirC = new File(this.path.getPath() + "/" + path + "/" + oldname);
         File newDirC = new File(dirC.getParent() + "/" + newName);
         dirC.renameTo(newDirC);
-        this.dropBoxSubjectRI.editFolder(path, oldname, newName);
+        this.dropBoxSubjectRI.renameFolder(path, oldname, newName);
     }
 }

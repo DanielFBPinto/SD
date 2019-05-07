@@ -85,33 +85,38 @@ public class DropBoxClient {
     }
 
     private void playService(String[] args) {
+        /* Diretório do lado do cliente */
+        String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
         try {
             /* Registar User */
             if (args[3].compareTo("register") == 0) {
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.register(args[4], args[5]);
-            } else {     /* Login User */
+                if (this.dropBoxSessionRI != null) {
+                    new File(userPath).mkdirs();
+                } else {
+                    System.out.println("Username já a ser utilizado");
+                }
+            } else if (args[3].compareTo("share") == 0){
+                this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
+                this.dropBoxSessionRI.shareOwnerSubjectWith(args[6]);
+            }else{     /* Login User */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
             }
-            if (this.dropBoxSessionRI != null) {
+            if (this.dropBoxSessionRI != null && args[3].compareTo("share") == 0) {
                 /* Receber Subject do owner */
                 DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
-                /* Diretório do lado do cliente */
-                String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
                 /* Criar Observer */
                 this.dropBoxObserverImpl = new DropBoxObserverImpl(new File(userPath), mySubject);
                 /* Dar attach do observador do cliente */
                 mySubject.attach(this.dropBoxObserverImpl);
                 /* Testar criação de pasta */
-                this.dropBoxObserverImpl.createFolder(".","jogos");
+//                this.dropBoxSessionRI.shareOwnerSubjectWith("daniel");
+                this.dropBoxObserverImpl.createFolder(".", "jogos");
                 /* Dar detach do observador do cliente */
                 mySubject.detach(this.dropBoxObserverImpl);
-            } else if (args[3].compareTo("register") == 0) {
-                System.out.println("Username já a ser utilizado");
             } else {
                 System.out.println("Login incorreto");
             }
-
-
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);

@@ -3,11 +3,13 @@ package server;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DropBoxSessionImpl implements DropBoxSessionRI, Serializable {
-    DropboxSubjectImpl ownerSubject;
+    private DropboxSubjectImpl ownerSubject;
+    private ArrayList<DropboxSubjectImpl> sharedSubjects = new ArrayList<>();
 
     public DropBoxSessionImpl(DropboxSubjectImpl ownerSubject) throws RemoteException {
         this.ownerSubject = ownerSubject;
@@ -22,4 +24,24 @@ public class DropBoxSessionImpl implements DropBoxSessionRI, Serializable {
     public DropboxSubjectImpl getOwnerSubject() throws RemoteException {
         return ownerSubject;
     }
+
+    @Override
+    public ArrayList<DropboxSubjectImpl> getSharedSubjects() throws RemoteException {
+        return sharedSubjects;
+    }
+
+    @Override
+    public boolean insertSubject(DropboxSubjectImpl d) throws RemoteException {
+        return this.sharedSubjects.add(d);
+    }
+
+    @Override
+    public void shareOwnerSubjectWith(String user) throws RemoteException {
+        User u = DB.getUser(user);
+        if (u != null) {
+            if(DB.getSession(u.getUsername(), u.getPassword()).insertSubject(this.ownerSubject))
+                DB.saveSessions();
+        }
+    }
+
 }
