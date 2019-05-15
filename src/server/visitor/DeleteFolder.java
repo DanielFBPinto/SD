@@ -1,21 +1,21 @@
 package server.visitor;
 
 import java.io.File;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class DeleteFolder implements Visitor {
+public class DeleteFolder implements Visitor, Serializable {
     private final String name;
     private final String path;
 
-    public DeleteFolder(String name, String path) throws RemoteException {
+    public DeleteFolder(String name, String path) {
         this.name = name;
         this.path = path;
-        export();
     }
 
     @Override
-    public void visit(File file) throws RemoteException {
+    public void visit(File file) {
         new File(file.getPath() + "/" + this.getPath() + "/" + this.getName()).delete();
     }
 
@@ -27,7 +27,4 @@ public class DeleteFolder implements Visitor {
         return path;
     }
 
-    private void export() throws RemoteException {
-        UnicastRemoteObject.exportObject(this, 0);
-    }
 }

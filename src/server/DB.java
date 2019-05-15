@@ -1,15 +1,25 @@
 package server;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
 public class DB {
     private static String path = System.getProperty("user.dir") + "../../../../db";
-    private static HashMap<String, DropBoxSessionImpl> session = new HashMap<>();
+    private static HashMap<String, DropBoxSubjectRI> subjects = new HashMap<>();
+    private static HashMap<String, ArrayList<String>> shared = new HashMap<>();
+
+    public static HashMap<String, DropBoxSubjectRI> getSubjects() {
+        return subjects;
+    }
+
+    public static HashMap<String, ArrayList<String>> getShared() {
+        return shared;
+    }
 
     public static void putUser(User user) {
-        try(FileInputStream in = new FileInputStream(path + "/users.properties")) {
+        try (FileInputStream in = new FileInputStream(path + "/users.properties")) {
             Properties prop = new Properties();
             prop.load(in);
             in.close();
@@ -17,7 +27,7 @@ public class DB {
             prop.setProperty(user.getUsername(), user.getPassword());
             prop.store(out, null);
             out.close();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Properties prop = new Properties();
             prop.setProperty(user.getUsername(), user.getPassword());
             try {
@@ -45,41 +55,30 @@ public class DB {
         return null;
     }
 
-    public static void saveSessions() {
+    public static void saveShared() {
         try {
-            FileOutputStream out = new FileOutputStream(path + "/sessions.txt");
+            FileOutputStream out = new FileOutputStream(path + "/shared.bin");
             ObjectOutputStream objOut = new ObjectOutputStream(out);
-            objOut.writeObject(session);
+            objOut.writeObject(shared);
             objOut.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public static void loadSessions() {
-        try {
-            ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(path + "/sessions.txt"));
-            Object obj = objIn.readObject();
-            if (obj instanceof HashMap) {
-                session = (HashMap<String, DropBoxSessionImpl>) obj;
+    public static void loadShared() {
+        if (new File(path + "shared.bin").exists()) {
+            try {
+                ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(path + "/shared.bin"));
+                Object obj = objIn.readObject();
+                if (obj instanceof HashMap) {
+                    shared = (HashMap<String, ArrayList<String>>) obj;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    public static void insertSession(String key, DropBoxSessionImpl value) {
-        if(session == null)
-            loadSessions();
-        session.put(key,value);
-        saveSessions();
-    }
 
-    public static DropBoxSessionRI getSession(String username, String password) {
-        if(session.isEmpty())
-            loadSessions();
-        if(getUser(username).getPassword().compareTo(password) == 0)
-            return session.get(username);
-        return null;
-    }
 }

@@ -3,16 +3,16 @@ package server;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.HashMap;
 
-public class DropBoxSessionImpl implements DropBoxSessionRI, Serializable {
-    private DropboxSubjectImpl ownerSubject;
-    private ArrayList<DropboxSubjectImpl> sharedSubjects = new ArrayList<>();
+public class DropBoxSessionImpl implements DropBoxSessionRI {
 
-    public DropBoxSessionImpl(DropboxSubjectImpl ownerSubject) throws RemoteException {
-        this.ownerSubject = ownerSubject;
+    private String owner;
+
+    public DropBoxSessionImpl(String owner) throws RemoteException {
+        this.owner = owner;
         export();
     }
 
@@ -21,27 +21,38 @@ public class DropBoxSessionImpl implements DropBoxSessionRI, Serializable {
     }
 
     @Override
-    public DropboxSubjectImpl getOwnerSubject() throws RemoteException {
-        return ownerSubject;
-    }
-
-    @Override
-    public ArrayList<DropboxSubjectImpl> getSharedSubjects() throws RemoteException {
-        return sharedSubjects;
-    }
-
-    @Override
-    public boolean insertSubject(DropboxSubjectImpl d) throws RemoteException {
-        return this.sharedSubjects.add(d);
-    }
-
-    @Override
-    public void shareOwnerSubjectWith(String user) throws RemoteException {
-        User u = DB.getUser(user);
-        if (u != null) {
-            if(DB.getSession(u.getUsername(), u.getPassword()).insertSubject(this.ownerSubject))
-                DB.saveSessions();
+    public DropBoxSubjectRI getOwnerSubject() throws RemoteException {
+        for (DropBoxSubjectRI d : DB.getSubjects().values()) {
+            System.out.println("Subjects: " + d.getOwner().getUsername());
         }
+        return DB.getSubjects().get(this.owner);
     }
 
+    @Override
+    public ArrayList<String> listSub() throws RemoteException {
+        return DB.getShared().get(owner);
+    }
+
+    @Override
+    public DropBoxSubjectRI getSubject(String owner) throws RemoteException {
+        if (DB.getShared().get(this.owner).contains(owner))
+            return DB.getSubjects().get(owner);
+        return null;
+    }
+
+    @Override
+    public boolean shareOwnerSubjectWith(String user) throws RemoteException {
+        if (DB.getUser(user) == null) {
+            return false;
+        }
+        ArrayList<String> a = DB.getShared().get(user);
+        if (a == null)
+            a = new ArrayList<>();
+        a.add(owner);
+        DB.getShared().put(user, a);
+        for (String s : DB.getShared().get(user)) {
+            System.out.println(user + " tem a pasta: " + s);
+        }
+        return true;
+    }
 }

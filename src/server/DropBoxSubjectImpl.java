@@ -7,19 +7,28 @@ import java.io.File;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
+public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     private File path;
     private User owner;
-    private State state;
+    private HashMap<Timestamp, Visitor> currentState = new HashMap<Timestamp, Visitor>();
+
     private ArrayList<DropBoxObserverRI> observers = new ArrayList<>();
 
     public File getPath() {
         return path;
     }
 
-    public DropboxSubjectImpl(User owner, File path) throws RemoteException {
+    @Override
+    public User getOwner() throws RemoteException {
+        return owner;
+    }
+
+    public DropBoxSubjectImpl(User owner, File path) throws RemoteException {
         this.owner = owner;
         this.path = path;
         export();
@@ -64,7 +73,12 @@ public class DropboxSubjectImpl implements DropBoxSubjectRI, Serializable {
 
     @Override
     public void accept(Visitor visitor) throws RemoteException {
-        visitor.visit(this.getPath());
-        notifyAll();
+//        this.currentState.put(t, visitor);
+        visitor.visit(this.path);
+        notifyAll(visitor);
+    }
+
+    public HashMap<Timestamp, Visitor> getCurrentState() throws RemoteException {
+        return currentState;
     }
 }

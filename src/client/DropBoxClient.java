@@ -1,10 +1,10 @@
 package client;
 
 
+import server.DB;
 import server.DropBoxFactoryRI;
 import server.DropBoxSessionRI;
 import server.DropBoxSubjectRI;
-import server.DropboxSubjectImpl;
 import util.rmisetup.SetupContextRMI;
 
 import java.io.File;
@@ -12,6 +12,7 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +34,10 @@ public class DropBoxClient {
      * Interface remota da sessão associada ao nosso client
      */
     private DropBoxSessionRI dropBoxSessionRI;
+    /**
+     * File da nossa pasta Dropbox(Cliente)
+     */
+    private File path;
 
     public static void main(String[] args) {
         if (args != null && args.length < 2) {
@@ -86,36 +91,40 @@ public class DropBoxClient {
 
     private void playService(String[] args) {
         /* Diretório do lado do cliente */
-        String userPath = System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")/" + args[4];
+        this.path = new File(System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")");
         try {
             /* Registar User */
             if (args[3].compareTo("register") == 0) {
-                this.dropBoxSessionRI = this.dropBoxFactoryRI.register(args[4], args[5]);
-                if (this.dropBoxSessionRI != null) {
-                    new File(userPath).mkdirs();
-                } else {
-                    System.out.println("Username já a ser utilizado");
-                }
-            } else if (args[3].compareTo("share") == 0){        /* Sharing Folders */
+                this.path.mkdirs();
+                if (!this.dropBoxFactoryRI.register(args[4], args[5]))
+                    System.out.println("Username já está a ser utilizado");
+            } else if (args[3].compareTo("share") == 0) {        /* Sharing Folders */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
-                this.dropBoxSessionRI.shareOwnerSubjectWith(args[6]);
-            }else{     /* Login User */
+                if (!this.dropBoxSessionRI.shareOwnerSubjectWith(args[6]))
+                    System.out.println("Erro a partilhar");
+                DB.saveShared();
+            } else {     /* Login User */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
-            }
-            /* Login/Registo bem sucedidos */
-            if (this.dropBoxSessionRI != null && !(args[3].compareTo("share") == 0)) {
                 /* Receber Subject do owner */
                 DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
                 /* Criar Observer */
-                this.dropBoxObserverImpl = new DropBoxObserverImpl(new File(userPath), mySubject);
-                /* Dar attach do observador do cliente */
-                mySubject.attach(this.dropBoxObserverImpl);
+                this.dropBoxObserverImpl = new DropBoxObserverImpl(mySubject, this.path);
+                /* Criar um observer por folder partilhada */
+                if (this.dropBoxSessionRI.listSub() != null) {
+                    for (String user : this.dropBoxSessionRI.listSub()) {
+                        new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), this.path);
+                    }
+                }
                 /* Testar criação de pasta */
-                this.dropBoxObserverImpl.createFolder(".", "jogos");
+                this.dropBoxObserverImpl.createFolder(".", "musica");
+                /* Colocar Cliente em sleep para partilhar folder */
+//                try {
+//                    TimeUnit.MINUTES.sleep(4);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 /* Dar detach do observador do cliente */
-                mySubject.detach(this.dropBoxObserverImpl);
-            } else {
-                System.out.println("Login incorreto");
+//                mySubject.detach(this.dropBoxObserverImpl);
             }
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {
