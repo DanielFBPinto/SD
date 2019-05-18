@@ -16,6 +16,7 @@ public class DeleteFile implements Visitor, Serializable {
 
     @Override
     public void visit(File file) {
+        System.out.println("Lets go delete " + this.name);
         new File(file.getPath() + "/" + this.path + "/" + this.name).delete();
     }
 

@@ -10,14 +10,6 @@ public class DB {
     private static HashMap<String, DropBoxSubjectRI> subjects = new HashMap<>();
     private static HashMap<String, ArrayList<String>> shared = new HashMap<>();
 
-    public static HashMap<String, DropBoxSubjectRI> getSubjects() {
-        return subjects;
-    }
-
-    public static HashMap<String, ArrayList<String>> getShared() {
-        return shared;
-    }
-
     public static void putUser(User user) {
         try (FileInputStream in = new FileInputStream(path + "/users.properties")) {
             Properties prop = new Properties();
@@ -78,6 +70,17 @@ public class DB {
                 e.printStackTrace();
             }
         }
+        for (String a : shared.keySet()) {
+            System.out.println(a);
+        }
+    }
+
+    public static HashMap<String, DropBoxSubjectRI> getSubjects() {
+        return subjects;
+    }
+
+    public static HashMap<String, ArrayList<String>> getShared() {
+        return shared;
     }
 
 

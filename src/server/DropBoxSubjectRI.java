@@ -4,6 +4,7 @@ import client.DropBoxObserverImpl;
 import client.DropBoxObserverRI;
 import server.visitor.Visitor;
 
+import java.io.File;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -17,5 +18,6 @@ public interface DropBoxSubjectRI extends Remote {
     public void deleteFolder(String path, String name) throws RemoteException;
     public void renameFolder(String path, String oldname, String newName) throws RemoteException;
     public void accept(Visitor visitor) throws RemoteException;
-    public HashMap<Timestamp, Visitor> getCurrentState() throws RemoteException;
+    public HashMap<File, Timestamp> getCurrentState() throws RemoteException;
+    public void setCurrentState(HashMap<File, Timestamp> currentState) throws RemoteException;
 }

@@ -15,8 +15,7 @@ import java.util.HashMap;
 public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     private File path;
     private User owner;
-    private HashMap<Timestamp, Visitor> currentState = new HashMap<Timestamp, Visitor>();
-
+    private HashMap<File, Timestamp> currentState = new HashMap<>();
     private ArrayList<DropBoxObserverRI> observers = new ArrayList<>();
 
     public File getPath() {
@@ -78,7 +77,11 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
         notifyAll(visitor);
     }
 
-    public HashMap<Timestamp, Visitor> getCurrentState() throws RemoteException {
+    public HashMap<File, Timestamp> getCurrentState() throws RemoteException {
         return currentState;
+    }
+
+    public void setCurrentState(HashMap<File, Timestamp> currentState) throws RemoteException {
+        this.currentState = currentState;
     }
 }

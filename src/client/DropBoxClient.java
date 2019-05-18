@@ -102,7 +102,6 @@ public class DropBoxClient {
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
                 if (!this.dropBoxSessionRI.shareOwnerSubjectWith(args[6]))
                     System.out.println("Erro a partilhar");
-                DB.saveShared();
             } else {     /* Login User */
                 this.dropBoxSessionRI = this.dropBoxFactoryRI.login(args[4], args[5]);
                 /* Receber Subject do owner */
@@ -112,17 +111,12 @@ public class DropBoxClient {
                 /* Criar um observer por folder partilhada */
                 if (this.dropBoxSessionRI.listSub() != null) {
                     for (String user : this.dropBoxSessionRI.listSub()) {
+                        System.out.println(user);
                         new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), this.path);
                     }
                 }
                 /* Testar criação de pasta */
-                this.dropBoxObserverImpl.createFolder(".", "musica");
-                /* Colocar Cliente em sleep para partilhar folder */
-//                try {
-//                    TimeUnit.MINUTES.sleep(4);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+//                this.dropBoxObserverImpl.createFolder(".", "musica");
                 /* Dar detach do observador do cliente */
 //                mySubject.detach(this.dropBoxObserverImpl);
             }

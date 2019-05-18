@@ -53,6 +53,7 @@ public class DropBoxSessionImpl implements DropBoxSessionRI {
         for (String s : DB.getShared().get(user)) {
             System.out.println(user + " tem a pasta: " + s);
         }
+        DB.saveShared();
         return true;
     }
 }
