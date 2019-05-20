@@ -21,6 +21,7 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
     private HashMap<File, Timestamp> currentState = new HashMap<>();
     private HashMap<File, Timestamp> lastState = new HashMap<>();
     private CheckFolderThread checkThread;
+    private SaveStateThread saveStateThread;
 
     public DropBoxObserverImpl(DropBoxSubjectRI dropBoxSubjectRI, File path) throws RemoteException {
         super();
@@ -31,9 +32,26 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         checkThread = new CheckFolderThread(this.path, currentState, lastState, dropBoxSubjectRI);
         checkThread.setPriority(Thread.MIN_PRIORITY);
         checkThread.start();
+        saveStateThread = new SaveStateThread(dropBoxSubjectRI.getOwner().getUsername(), currentState);
+        saveStateThread.setPriority(Thread.MIN_PRIORITY);
+        saveStateThread.start();
         export();
     }
 
+    public DropBoxObserverImpl(DropBoxSubjectRI dropBoxSubjectRI, File path, HashMap<File, Timestamp> currentState) throws RemoteException {
+        super();
+        this.dropBoxSubjectRI = dropBoxSubjectRI;
+        this.path = new File(path.getPath() + "/" + dropBoxSubjectRI.getOwner().getUsername());
+        this.path.mkdirs();
+        for (File f : currentState.keySet()) {
+            System.out.println(f.getName());
+        }
+        update();
+//        checkThread = new CheckFolderThread(this.path, currentState, lastState, dropBoxSubjectRI);
+//        checkThread.setPriority(Thread.MIN_PRIORITY);
+//        checkThread.start();
+        export();
+    }
 
     public void export() throws RemoteException {
         UnicastRemoteObject.exportObject(this, 0);

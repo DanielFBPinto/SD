@@ -7,11 +7,14 @@ import server.DropBoxSessionRI;
 import server.DropBoxSubjectRI;
 import util.rmisetup.SetupContextRMI;
 
-import java.io.File;
+import java.io.*;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,17 +30,17 @@ public class DropBoxClient {
      */
     private DropBoxFactoryRI dropBoxFactoryRI;
     /**
-     * Interface remota do Observador associado ao nosso client
-     */
-    private DropBoxObserverImpl dropBoxObserverImpl;
-    /**
      * Interface remota da sessão associada ao nosso client
      */
     private DropBoxSessionRI dropBoxSessionRI;
     /**
      * File da nossa pasta Dropbox(Cliente)
      */
-    private File path;
+    private static File path;
+    /**
+     * O estado atual de cada uma das pastas do cliente
+     */
+    private static HashMap<String, HashMap<File, Timestamp>> currentStates;
 
     public static void main(String[] args) {
         if (args != null && args.length < 2) {
@@ -89,13 +92,42 @@ public class DropBoxClient {
         return dropBoxFactoryRI;
     }
 
+    private void loadCurrentState() {
+        if (new File(path + "/.conf").exists()) {
+            try {
+                ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(path + "/.conf"));
+                Object obj = objIn.readObject();
+                if (obj instanceof HashMap) {
+                    currentStates = (HashMap<String, HashMap<File, Timestamp>>) obj;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void insertCurrentState(HashMap cs, String user){
+        if(currentStates == null)
+            currentStates = new HashMap<>();
+        currentStates.put(user,cs);
+        try {
+            FileOutputStream out = new FileOutputStream(path + "/.conf");
+            ObjectOutputStream objOut = new ObjectOutputStream(out);
+            objOut.writeObject(currentStates);
+            objOut.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void playService(String[] args) {
         /* Diretório do lado do cliente */
-        this.path = new File(System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")");
+        path = new File(System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")");
+        loadCurrentState();
         try {
             /* Registar User */
             if (args[3].compareTo("register") == 0) {
-                this.path.mkdirs();
+                path.mkdirs();
                 if (!this.dropBoxFactoryRI.register(args[4], args[5]))
                     System.out.println("Username já está a ser utilizado");
             } else if (args[3].compareTo("share") == 0) {        /* Sharing Folders */
@@ -107,16 +139,19 @@ public class DropBoxClient {
                 /* Receber Subject do owner */
                 DropBoxSubjectRI mySubject = this.dropBoxSessionRI.getOwnerSubject();
                 /* Criar Observer */
-                this.dropBoxObserverImpl = new DropBoxObserverImpl(mySubject, this.path);
+                if (currentStates != null && currentStates.containsKey(mySubject.getOwner().getUsername()))
+                    new DropBoxObserverImpl(mySubject, path, currentStates.get(mySubject.getOwner().getUsername()));
+                else
+                    new DropBoxObserverImpl(mySubject, path);
                 /* Criar um observer por folder partilhada */
                 if (this.dropBoxSessionRI.listSub() != null) {
                     for (String user : this.dropBoxSessionRI.listSub()) {
-                        System.out.println(user);
-                        new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), this.path);
+                        if (currentStates != null && currentStates.containsKey(user))
+                            new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), path, currentStates.get(user));
+                        else
+                            new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), path);
                     }
                 }
-                /* Testar criação de pasta */
-//                this.dropBoxObserverImpl.createFolder(".", "musica");
                 /* Dar detach do observador do cliente */
 //                mySubject.detach(this.dropBoxObserverImpl);
             }
