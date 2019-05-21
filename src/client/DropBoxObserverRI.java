@@ -9,8 +9,6 @@ import java.sql.Timestamp;
 
 public interface DropBoxObserverRI extends Remote {
     public void update() throws RemoteException;
-    public void createFolder(String path, String name) throws RemoteException;
-    public void deleteFolder(String path, String name) throws RemoteException;
-    public void renameFolder(String path, String oldname, String newName) throws RemoteException;
     public void accept(Visitor visitor) throws RemoteException;
+    public boolean getStatus() throws RemoteException;
 }

@@ -26,7 +26,7 @@ public class CreateFile implements Visitor, Serializable {
     @Override
     public void visit(File file) {
         try {
-            File f = new File(file.getPath() + this.path + "/" + this.name);
+            File f = new File(file.getPath() + "/" + this.path + "/" + this.name);
             f.createNewFile();
             FileOutputStream out = new FileOutputStream(f);
             out.write(fileContent);

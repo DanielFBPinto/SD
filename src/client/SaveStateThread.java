@@ -16,12 +16,15 @@ public class SaveStateThread extends Thread {
 
     public void run() {
         while (keepRunning) {
-            DropBoxClient.insertCurrentState(currentState, owner);
-        }
-        try {
-            Thread.sleep(17500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            synchronized (currentState) {
+                DropBoxClient.insertCurrentState(currentState, owner);
+//                System.out.println("Estado guardado!");
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

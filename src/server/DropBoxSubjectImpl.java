@@ -1,5 +1,6 @@
 package server;
 
+import client.CheckFolderThread;
 import client.DropBoxObserverRI;
 import server.visitor.Visitor;
 
@@ -17,6 +18,7 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     private User owner;
     private HashMap<File, Timestamp> currentState = new HashMap<>();
     private ArrayList<DropBoxObserverRI> observers = new ArrayList<>();
+    private CheckObserverThread checkObserverThread;
 
     public File getPath() {
         return path;
@@ -28,8 +30,12 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     }
 
     public DropBoxSubjectImpl(User owner, File path) throws RemoteException {
+        super();
         this.owner = owner;
         this.path = path;
+        checkObserverThread = new CheckObserverThread(this.observers);
+        checkObserverThread.setPriority(Thread.MIN_PRIORITY);
+        checkObserverThread.start();
         export();
     }
 
@@ -65,8 +71,10 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     }
 
     private void notifyAll(Visitor visitor) throws RemoteException {
+        System.out.println("Number of observers: " + this.observers.size());
         for (DropBoxObserverRI obs : this.observers) {
-            obs.accept(visitor);
+            if(obs != null)
+                obs.accept(visitor);
         }
     }
 

@@ -56,7 +56,7 @@ public class CheckFolderThread extends Thread {
 
     public void compareStates() throws RemoteException {
         for (File f : currentState.keySet()) {
-            System.out.println("CurrentState: " + f.getName());
+//            System.out.println("CurrentState: " + f.getName());
             if (!lastState.containsKey(f)) {
                 if (f.isDirectory()) {
                     Visitor visitor = new CreateFolder(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
@@ -75,15 +75,13 @@ public class CheckFolderThread extends Thread {
             }
         }
         for (File f : lastState.keySet()) {
-            System.out.println("LastState: " + f.getName());
+//            System.out.println("LastState: " + f.getName());
             if (!currentState.containsKey(f)) {
-                System.out.println("Teste");
                 if (f.isDirectory()) {
                     Visitor visitor = new DeleteFolder(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 } else {
-                    System.out.println("Teste2");
                     Visitor visitor = new DeleteFile(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
