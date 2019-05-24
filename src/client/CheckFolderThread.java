@@ -88,6 +88,10 @@ public class CheckFolderThread extends Thread {
                     }
                 }
             }
+
+
+
+
         }
         for (File f : lastState.keySet()) {
             if (!currentState.containsKey(f)) {
