@@ -13,7 +13,11 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
         runFunction();
     }
 
-    private void runFunction() throws RemoteException{
+    /**
+     * Função usada para carregar todos os subjects existentes para o servidor
+     * @throws RemoteException
+     */
+    private void runFunction() throws RemoteException {
         for (File f : this.path.listFiles()) {
             DropBoxSubjectImpl d = new DropBoxSubjectImpl(DB.getUser(f.getName()), f);
             DB.getSubjects().put(f.getName(), d);
@@ -21,6 +25,14 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
         DB.loadShared();
     }
 
+    /**
+     * Regista o utilizador na base de dados, cria o seu path do lado do servidor e associa ao seu utilizador um subject
+     * na base de dados
+     * @param username
+     * @param password
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public boolean register(String username, String password) throws RemoteException {
         /* Verifica se já existe o username na DB */
@@ -31,7 +43,7 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
         User user = new User(username, password);
         DB.putUser(user);
         // Criar pasta do User no Server
-        File path = new File( this.path.getPath() + "/" + username);
+        File path = new File(this.path.getPath() + "/" + username);
         path.mkdirs();
         /* Criar subject */
         DropBoxSubjectImpl d = new DropBoxSubjectImpl(user, path);
@@ -40,9 +52,16 @@ public class DropBoxFactoryImpl extends UnicastRemoteObject implements DropBoxFa
         return true;
     }
 
+    /**
+     * Retorna ao utilizador uma sessão associada.
+     * @param username
+     * @param password
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public DropBoxSessionRI login(String username, String password) throws RemoteException {
-        if(DB.getUser(username).getPassword().compareTo(password) == 0)
+        if (DB.getUser(username).getPassword().compareTo(password) == 0)
             return new DropBoxSessionImpl(username);
         return null;
     }

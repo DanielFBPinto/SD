@@ -1,9 +1,6 @@
 package server.visitor;
 
 import java.io.File;
-import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
 public class CreateFolder implements Visitor {
     private final String name;
@@ -15,6 +12,10 @@ public class CreateFolder implements Visitor {
         this.path = path;
     }
 
+    /**
+     * Cria uma folder dado um caminho e um nome
+     * @param file
+     */
     @Override
     public void visit(File file) {
         new File(file.getPath() + "/" + this.path + "/" + this.name).mkdirs();

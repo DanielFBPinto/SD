@@ -1,6 +1,5 @@
 package server;
 
-import client.CheckFolderThread;
 import client.DropBoxObserverRI;
 import server.visitor.Visitor;
 
@@ -8,7 +7,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +22,12 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
         return path;
     }
 
+    /**
+     * Retorna o owner do subject
+     * @return
+     */
     @Override
-    public User getOwner() throws RemoteException {
+    public User getOwner() {
         return owner;
     }
 
@@ -44,52 +46,43 @@ public class DropBoxSubjectImpl implements DropBoxSubjectRI, Serializable {
     }
 
     @Override
-    public void attach(DropBoxObserverRI obsRI) throws RemoteException {
+    public void attach(DropBoxObserverRI obsRI) {
         this.observers.add(obsRI);
     }
 
     @Override
-    public void detach(DropBoxObserverRI obsRI) throws RemoteException {
+    public void detach(DropBoxObserverRI obsRI) {
         this.observers.remove(obsRI);
     }
 
-    @Override
-    public void createFolder(String path, String name) throws RemoteException {
-        new File(this.path.getPath() + "/" + path + "/" + name).mkdirs();
-    }
-
-    @Override
-    public void deleteFolder(String path, String name) throws RemoteException {
-        new File(this.path.getPath() + "/" + path + "/" + name).delete();
-    }
-
-    @Override
-    public void renameFolder(String path, String oldname, String newName) throws RemoteException {
-        File dir = new File(this.path.getPath() + "/" + path + "/" + oldname);
-        File newDir = new File(dir.getParent() + "/" + newName);
-        dir.renameTo(newDir);
-    }
-
+    /**
+     * Propaga as alterações recebidas por todos os observers
+     * @param visitor
+     * @throws RemoteException
+     */
     private void notifyAll(Visitor visitor) throws RemoteException {
-        System.out.println("Number of observers: " + this.observers.size());
         for (DropBoxObserverRI obs : this.observers) {
-            if(obs != null)
+            if (obs != null)
                 obs.accept(visitor);
         }
     }
 
+    /**
+     * Aplica as alterações recebidas chamando no final o notifyAll para a propagação das mesmas
+     * @param visitor
+     * @throws RemoteException
+     */
     @Override
     public void accept(Visitor visitor) throws RemoteException {
-//        this.currentState.put(t, visitor);
         visitor.visit(this.path);
         notifyAll(visitor);
     }
 
-    public HashMap<File, Timestamp> getCurrentState() throws RemoteException {
+    public HashMap<File, Timestamp> getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(HashMap<File, Timestamp> currentState) throws RemoteException {
+    public void setCurrentState(HashMap<File, Timestamp> currentState) {
         this.currentState = currentState;
     }
 }

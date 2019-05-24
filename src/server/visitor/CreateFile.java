@@ -1,10 +1,10 @@
 package server.visitor;
 
-import java.io.*;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-public class CreateFile implements Visitor, Serializable {
+public class CreateFile implements Visitor {
     private final String name;
     private final String path;
     private final byte[] fileContent;
@@ -23,6 +23,10 @@ public class CreateFile implements Visitor, Serializable {
         return path;
     }
 
+    /**
+     * Cria um file dado um nome, caminho e conteúdo
+     * @param file
+     */
     @Override
     public void visit(File file) {
         try {

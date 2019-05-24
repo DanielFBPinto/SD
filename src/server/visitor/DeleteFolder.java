@@ -1,11 +1,8 @@
 package server.visitor;
 
 import java.io.File;
-import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
-public class DeleteFolder implements Visitor, Serializable {
+public class DeleteFolder implements Visitor {
     private final String name;
     private final String path;
 
@@ -14,9 +11,12 @@ public class DeleteFolder implements Visitor, Serializable {
         this.path = path;
     }
 
+    /**
+     * Apaga uma pasta e o seu conteúdo dado um caminho e um nome
+     * @param file
+     */
     @Override
     public void visit(File file) {
-        System.out.println("Lets go delete " + this.name);
         File rec = new File(file.getPath() + "/" + this.getPath() + "/" + this.getName());
         deleteFolder(rec);
     }

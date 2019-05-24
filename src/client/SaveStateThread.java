@@ -9,6 +9,11 @@ public class SaveStateThread extends Thread {
     private final HashMap<File, Timestamp> currentState;
     private final String owner;
 
+    /**
+     * Guarda do lado do cliente o estado atual das suas pastas a cada 5s
+     * @param owner
+     * @param cs
+     */
     public SaveStateThread(String owner, HashMap cs) {
         this.currentState = cs;
         this.owner = owner;
@@ -18,7 +23,6 @@ public class SaveStateThread extends Thread {
         while (keepRunning) {
             synchronized (currentState) {
                 DropBoxClient.insertCurrentState(currentState, owner);
-//                System.out.println("Estado guardado!");
             }
             try {
                 Thread.sleep(2000);
