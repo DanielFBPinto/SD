@@ -9,8 +9,6 @@ import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CheckFolderThread extends Thread {
     private boolean keepRunning = true;
@@ -56,6 +54,13 @@ public class CheckFolderThread extends Thread {
         }
     }
 
+    /**
+     * Método para comparar os estados de uma pasta
+     * Se houverem novos Files -> Adiciona um novo Ficheiro/Pasta
+     * Os files que já existem verifica o lastModified -> Se for diferente atualiza o ficheiro
+     * Se faltarem Files -> Remove o Ficheiro/Pasta
+     * @throws RemoteException
+     */
     public void compareStates() throws RemoteException {
         for (File f : currentState.keySet()) {
             if (!lastState.containsKey(f)) {
@@ -77,7 +82,6 @@ public class CheckFolderThread extends Thread {
                 Timestamp lastT = lastState.get(f);
                 Timestamp currentT = currentState.get(f);
                 if (currentT.after(lastT)) {
-                    System.out.println(this.getClass().getName() + " - compareStates(): FIcheiro foi modificado");
                     try {
                         byte[] fileContent = Files.readAllBytes(f.toPath());
                         Visitor visitor = new EditFile(f.getName(), f.getParent().replace(this.root.getPath(), ""), fileContent);

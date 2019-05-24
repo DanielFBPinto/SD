@@ -3,11 +3,8 @@ package server.visitor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
-public class EditFile implements Visitor, Serializable {
+public class EditFile implements Visitor {
     private final String name;
     private final String path;
     private final byte[] fileContent;
@@ -26,6 +23,10 @@ public class EditFile implements Visitor, Serializable {
         return path;
     }
 
+    /**
+     * Altera o conteúdo de um ficheiro dado o caminho, nome e novo conteúdo para o mesmo
+     * @param file
+     */
     @Override
     public void visit(File file) {
         try {

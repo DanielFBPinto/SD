@@ -6,10 +6,23 @@ import java.util.HashMap;
 import java.util.Properties;
 
 public class DB {
+    /**
+     * Caminho para os ficheiros da base de dados
+     */
     private static String path = System.getProperty("user.dir") + "../../../../db";
+    /**
+     * Hashmap para associação dos subjects com os seus owners
+     */
     private static HashMap<String, DropBoxSubjectRI> subjects = new HashMap<>();
+    /**
+     * Hashmap onde guardo para cada utilizador a lista de utilizadores que partilharam a sua pasta com ele
+     */
     private static HashMap<String, ArrayList<String>> shared = new HashMap<>();
 
+    /**
+     * Verifica se é possível inserir um utilizador e insere
+     * @param user
+     */
     public static void putUser(User user) {
         try (FileInputStream in = new FileInputStream(path + "/users.properties")) {
             Properties prop = new Properties();
@@ -30,6 +43,11 @@ public class DB {
         }
     }
 
+    /**
+     * Retorno um utilizador dado um username
+     * @param name
+     * @return
+     */
     public static User getUser(String name) {
         try (InputStream input = new FileInputStream(path + "/users.properties")) {
 
@@ -47,6 +65,9 @@ public class DB {
         return null;
     }
 
+    /**
+     * Guardo num ficheiro as pastas partilhadas de todos os utilizadores
+     */
     public static void saveShared() {
         try {
             FileOutputStream out = new FileOutputStream(path + "/shared.bin");
@@ -58,6 +79,9 @@ public class DB {
         }
     }
 
+    /**
+     * Carrego as pastas partilhadas para o servidor
+     */
     public static void loadShared() {
         if (new File(path + "shared.bin").exists()) {
             try {
@@ -69,9 +93,6 @@ public class DB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        for (String a : shared.keySet()) {
-            System.out.println(a);
         }
     }
 

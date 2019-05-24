@@ -1,7 +1,6 @@
 package client;
 
 
-import server.DB;
 import server.DropBoxFactoryRI;
 import server.DropBoxSessionRI;
 import server.DropBoxSubjectRI;
@@ -13,9 +12,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,6 +103,11 @@ public class DropBoxClient {
         }
     }
 
+    /**
+     * Guarda localmente o estado das pastas de um certo utilizador, para utilizar quando fizer login novamente
+     * @param cs
+     * @param user
+     */
     public static void insertCurrentState(HashMap cs, String user){
         if(currentStates == null)
             currentStates = new HashMap<>();
@@ -120,6 +122,11 @@ public class DropBoxClient {
         }
     }
 
+    /**
+     * Função onde se chama as funcionalidades necessárias para registo, login e partilha de uma pasta com outro
+     * utilizador, dependendo do que o utilizador enviar nos argumentos.
+     * @param args
+     */
     private void playService(String[] args) {
         /* Diretório do lado do cliente */
         path = new File(System.getProperty("user.dir") + "../../../../data/Cliente/Dropbox(" + args[4] + ")");
@@ -152,8 +159,6 @@ public class DropBoxClient {
                             new DropBoxObserverImpl(this.dropBoxSessionRI.getSubject(user), path);
                     }
                 }
-                /* Dar detach do observador do cliente */
-//                mySubject.detach(this.dropBoxObserverImpl);
             }
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "goint to finish, bye. ;)");
         } catch (RemoteException ex) {

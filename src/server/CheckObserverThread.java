@@ -12,6 +12,10 @@ public class CheckObserverThread extends Thread {
     private boolean keepRunning = true;
     private final ArrayList<DropBoxObserverRI> observers;
 
+    /**
+     * Verifica a cada 1s se existe algum observador no subject que já não esteja ativo
+     * @param obs
+     */
     public CheckObserverThread(ArrayList<DropBoxObserverRI> obs) {
         this.observers = obs;
     }

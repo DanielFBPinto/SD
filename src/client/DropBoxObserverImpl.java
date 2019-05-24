@@ -8,12 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DropBoxObserverImpl implements DropBoxObserverRI {
     private DropBoxSubjectRI dropBoxSubjectRI;
@@ -23,6 +19,13 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
     private CheckFolderThread checkThread;
     private SaveStateThread saveStateThread;
 
+    /**
+     * Construtor para o caso em que o utlizador não tem um estado atual da pasta gravado, logo a pasta deverá ser
+     * reescrita/escrita pela primeira vez.
+     * @param dropBoxSubjectRI
+     * @param path
+     * @throws RemoteException
+     */
     public DropBoxObserverImpl(DropBoxSubjectRI dropBoxSubjectRI, File path) throws RemoteException {
         super();
         this.dropBoxSubjectRI = dropBoxSubjectRI;
@@ -38,6 +41,15 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         export();
     }
 
+    /**
+     * Construtor para o caso em que o utilizador tem um estado atual da pasta e então aí é feito envio das alterações
+     * do utilizador no tempo que esteve offline e posteriormente carregadas as alterações que houveram no tempo que
+     * teve offline
+     * @param dropBoxSubjectRI
+     * @param path
+     * @param currentState
+     * @throws RemoteException
+     */
     public DropBoxObserverImpl(DropBoxSubjectRI dropBoxSubjectRI, File path, HashMap<File, Timestamp> currentState) throws RemoteException {
         super();
         this.dropBoxSubjectRI = dropBoxSubjectRI;
@@ -59,6 +71,10 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         this.dropBoxSubjectRI.attach(this);
     }
 
+    /**
+     * Atualização da pasta do utilizador após login (primeiro login não atualiza porque não tem ainda nada).
+     * @throws RemoteException
+     */
     @Override
     public void update() throws RemoteException {
         File files[] = this.path.listFiles();
@@ -70,27 +86,28 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         compareStates();
     }
 
-
+    /**
+     * Aceita o visitor e executa o que houver
+     * @param visitor
+     */
     @Override
-    public void accept(Visitor visitor) throws RemoteException {
-//        this.currentState = t;
-//        this.dropBoxSessionRI.getCurrentStates().put(this.dropBoxSubjectRI.getOwner(), t);
+    public void accept(Visitor visitor) {
         visitor.visit(this.path);
-//        DB.saveSessions();
     }
 
+    /**
+     * Função usada para comparar os estados das pastas e proceder as atualizações necessárias
+     * @throws RemoteException
+     */
     public void compareStates() throws RemoteException {
         for (File f : currentState.keySet()) {
-            System.out.println("CurrentState: " + f.getName());
             if (!lastState.containsKey(f)) {
                 if (f.isDirectory()) {
-                    System.out.println("Teste 1");
                     Visitor visitor = new CreateFolder(f.getName(), f.getParent().replace(this.path.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 } else {
                     try {
-                        System.out.println("Teste 2");
                         byte[] fileContent = Files.readAllBytes(f.toPath());
                         Visitor visitor = new CreateFile(f.getName(), f.getParent().replace(this.path.getPath(), ""), fileContent);
                         this.dropBoxSubjectRI.accept(visitor);
@@ -102,15 +119,12 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
             }
         }
         for (File f : lastState.keySet()) {
-            System.out.println("LastState: " + f.getName());
             if (!currentState.containsKey(f)) {
                 if (f.isDirectory()) {
-                    System.out.println("Teste 3");
                     Visitor visitor = new DeleteFolder(f.getName(), f.getParent().replace(this.path.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 } else {
-                    System.out.println("Teste 4");
                     Visitor visitor = new DeleteFile(f.getName(), f.getParent().replace(this.path.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
@@ -121,7 +135,11 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         lastState.putAll(currentState);
     }
 
-    public boolean getStatus() throws RemoteException {
+    /**
+     * Função usada para verificar se o observador atual continua ativo
+     * @return
+     */
+    public boolean getStatus() {
         return true;
     }
 }
