@@ -29,7 +29,7 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         this.path = new File(path.getPath() + "/" + dropBoxSubjectRI.getOwner().getUsername());
         this.path.mkdirs();
         update();
-        checkThread = new CheckFolderThread(this.path, currentState, lastState, dropBoxSubjectRI);
+        checkThread = new CheckFolderThread(this.path, this.path, currentState, lastState, dropBoxSubjectRI);
         checkThread.setPriority(Thread.MIN_PRIORITY);
         checkThread.start();
         saveStateThread = new SaveStateThread(dropBoxSubjectRI.getOwner().getUsername(), currentState);
@@ -45,7 +45,7 @@ public class DropBoxObserverImpl implements DropBoxObserverRI {
         this.path.mkdirs();
         this.lastState = currentState;
         update();
-        checkThread = new CheckFolderThread(this.path, this.currentState, lastState, dropBoxSubjectRI);
+        checkThread = new CheckFolderThread(this.path, this.path, this.currentState, lastState, dropBoxSubjectRI);
         checkThread.setPriority(Thread.MIN_PRIORITY);
         checkThread.start();
         saveStateThread = new SaveStateThread(dropBoxSubjectRI.getOwner().getUsername(), currentState);

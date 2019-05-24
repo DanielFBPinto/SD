@@ -14,12 +14,14 @@ import java.util.stream.Collectors;
 
 public class CheckFolderThread extends Thread {
     private boolean keepRunning = true;
+    private final File root;
     private final File folder;
     private final HashMap<File, Timestamp> currentState;
     private final HashMap<File, Timestamp> lastState;
     private final DropBoxSubjectRI dropBoxSubjectRI;
 
-    public CheckFolderThread(File folder, HashMap cs, HashMap ls, DropBoxSubjectRI ds) {
+    public CheckFolderThread(File root, File folder, HashMap cs, HashMap ls, DropBoxSubjectRI ds) {
+        this.root = root;
         this.folder = folder;
         this.currentState = cs;
         this.lastState = ls;
@@ -36,8 +38,8 @@ public class CheckFolderThread extends Thread {
                     currentState.clear();
                     for (File f : files) {
                         currentState.put(f, new Timestamp(f.lastModified()));
-//                        if(f.isDirectory())
-//                            new CheckFolderThread(f, currentState, lastState, dropBoxSubjectRI).start();
+//                        if (f.isDirectory())
+//                            new CheckFolderThread(root, f, currentState, lastState, dropBoxSubjectRI).start();
                     }
                     try {
                         compareStates();
@@ -56,16 +58,29 @@ public class CheckFolderThread extends Thread {
 
     public void compareStates() throws RemoteException {
         for (File f : currentState.keySet()) {
-//            System.out.println("CurrentState: " + f.getName());
             if (!lastState.containsKey(f)) {
                 if (f.isDirectory()) {
-                    Visitor visitor = new CreateFolder(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
+                    Visitor visitor = new CreateFolder(f.getName(), f.getParent().replace(this.root.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 } else {
                     try {
                         byte[] fileContent = Files.readAllBytes(f.toPath());
-                        Visitor visitor = new CreateFile(f.getName(), f.getParent().replace(this.folder.getPath(), ""), fileContent);
+                        Visitor visitor = new CreateFile(f.getName(), f.getParent().replace(this.root.getPath(), ""), fileContent);
+                        this.dropBoxSubjectRI.accept(visitor);
+                        this.dropBoxSubjectRI.setCurrentState(currentState);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                Timestamp lastT = lastState.get(f);
+                Timestamp currentT = currentState.get(f);
+                if (currentT.after(lastT)) {
+                    System.out.println(this.getClass().getName() + " - compareStates(): FIcheiro foi modificado");
+                    try {
+                        byte[] fileContent = Files.readAllBytes(f.toPath());
+                        Visitor visitor = new EditFile(f.getName(), f.getParent().replace(this.root.getPath(), ""), fileContent);
                         this.dropBoxSubjectRI.accept(visitor);
                         this.dropBoxSubjectRI.setCurrentState(currentState);
                     } catch (IOException e) {
@@ -75,14 +90,13 @@ public class CheckFolderThread extends Thread {
             }
         }
         for (File f : lastState.keySet()) {
-//            System.out.println("LastState: " + f.getName());
             if (!currentState.containsKey(f)) {
                 if (f.isDirectory()) {
-                    Visitor visitor = new DeleteFolder(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
+                    Visitor visitor = new DeleteFolder(f.getName(), f.getParent().replace(this.root.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 } else {
-                    Visitor visitor = new DeleteFile(f.getName(), f.getParent().replace(this.folder.getPath(), ""));
+                    Visitor visitor = new DeleteFile(f.getName(), f.getParent().replace(this.root.getPath(), ""));
                     this.dropBoxSubjectRI.accept(visitor);
                     this.dropBoxSubjectRI.setCurrentState(currentState);
                 }

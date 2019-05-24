@@ -1,6 +1,8 @@
 package server.visitor;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -8,15 +10,12 @@ import java.rmi.server.UnicastRemoteObject;
 public class EditFile implements Visitor, Serializable {
     private final String name;
     private final String path;
+    private final byte[] fileContent;
 
-    public EditFile(String name, String path) {
+    public EditFile(String name, String path, byte[] fileContent) {
         this.name = name;
         this.path = path;
-    }
-
-    @Override
-    public void visit(File file) {
-        /* TODO */
+        this.fileContent = fileContent;
     }
 
     public String getName() {
@@ -25,5 +24,17 @@ public class EditFile implements Visitor, Serializable {
 
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public void visit(File file) {
+        try {
+            File f = new File(file.getPath() + "/" + this.path + "/" + this.name);
+            FileOutputStream out = new FileOutputStream(f);
+            out.write(fileContent);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
